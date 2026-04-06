@@ -9,6 +9,7 @@ namespace Kursovichok2
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+
         public DbSet<User> Users { get; set; }
         public DbSet<Board> Boards { get; set; }
         public DbSet<Task> Tasks { get; set; }
