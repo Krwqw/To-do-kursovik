@@ -1,4 +1,6 @@
-﻿namespace Kursovichok2
+﻿using Kursovichok2.Models;
+
+namespace Kursovichok2.Models
 {
     public class Board
     {

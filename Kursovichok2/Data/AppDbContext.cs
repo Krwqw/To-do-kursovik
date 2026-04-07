@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
-using Kursovichok2;
+using Kursovichok2.Models;
 
-namespace Kursovichok2
+namespace Kursovichok2.Data
 {
     public class AppDbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }  //принимает настройки подключения, получает необходимые ему зависимости извне
 
+        //представление таблиц в базе данных, через них выполняются все операции в будущем
 
         public DbSet<User> Users { get; set; }
         public DbSet<Board> Boards { get; set; }
@@ -20,18 +21,19 @@ namespace Kursovichok2
         {
             base.OnModelCreating(modelBuilder);
 
-            // User configuration
+            //метод который настраивает как классы превращаются в таблицы
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.UserName).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
-                entity.HasIndex(e => e.Email).IsUnique();
-                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255);
-                entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
+                entity.HasKey(e => e.Id); //первичный ключ
+                entity.Property(e => e.UserName).IsRequired().HasMaxLength(50); //имя пользователя, макс 50 символов, 
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(100); //
+                entity.HasIndex(e => e.Email).IsUnique(); //хэш индекс, уникальный, чтоб не было повторений пользователей
+                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255); //
+                entity.Property(e => e.Role).IsRequired().HasMaxLength(20); //
             });
+            //*IsRequired() - не даст сохранить, если нет имени или почты
 
-            // Board configuration
+            //конфигурация досок (набор настроек для досок)
             modelBuilder.Entity<Board>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -42,7 +44,7 @@ namespace Kursovichok2
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Task configuration
+            //конфигурация задач
             modelBuilder.Entity<Task>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -60,7 +62,7 @@ namespace Kursovichok2
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Comment configuration
+            //конфигурация комментариев
             modelBuilder.Entity<Comment>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -77,7 +79,7 @@ namespace Kursovichok2
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Notification configuration
+            //конфигурация уведомлений
             modelBuilder.Entity<Notification>(entity =>
             {
                 entity.HasKey(e => e.Id);

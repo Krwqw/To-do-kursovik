@@ -1,4 +1,4 @@
-﻿namespace Kursovichok2
+﻿namespace Kursovichok2.Models
 {
     public class Comment
     {

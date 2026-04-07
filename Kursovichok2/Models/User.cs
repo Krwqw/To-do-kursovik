@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace Kursovichok2
+namespace Kursovichok2.Models
 {
     public class User
     {
