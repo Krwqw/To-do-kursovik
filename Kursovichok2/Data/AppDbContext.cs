@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Kursovichok2.Models;
 
 namespace Kursovichok2.Data
 {
-    public class AppDbContext
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }  //принимает настройки подключения, получает необходимые ему зависимости извне
 
@@ -13,7 +14,7 @@ namespace Kursovichok2.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Board> Boards { get; set; }
-        public DbSet<Task> Tasks { get; set; }
+        public DbSet<Kursovichok2.Models.Task> Tasks { get; set; } //конфликт поэтому полное название класса task
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
@@ -45,7 +46,7 @@ namespace Kursovichok2.Data
             });
 
             //конфигурация задач
-            modelBuilder.Entity<Task>(entity =>
+            modelBuilder.Entity<Kursovichok2.Models.Task>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(100);
