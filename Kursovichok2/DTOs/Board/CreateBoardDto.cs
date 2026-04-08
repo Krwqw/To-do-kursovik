@@ -2,7 +2,7 @@
 
 namespace Kursovichok2.DTOs.Board
 {
-    public class CreateDto
+    public class CreateBoardDto
     {
         //создание доски
         [Required]

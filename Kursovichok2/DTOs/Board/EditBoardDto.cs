@@ -2,7 +2,7 @@
 
 namespace Kursovichok2.DTOs.Board
 {
-    public class EditingDto
+    public class EditBoardDto
     {
         //изменение доски
         [StringLength(100)]
