@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Kursovichok2.Data;
-using Kursovichok2.DTOs.Comment; // Убедись, что у тебя есть этот namespace
+using Kursovichok2.DTOs.Comment;
 using Kursovichok2.Models;
 
 namespace Kursovichok2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Требуется авторизация для всех действий
+    [Authorize]
     public class CommentsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -20,14 +20,75 @@ namespace Kursovichok2.Controllers
             _context = context;
         }
 
-        //  1. Получить все комментарии конкретной задачи
+        //  ОСНОВНОЙ МЕТОД: POST /api/comments
+        [HttpPost]
+        public async Task<ActionResult<CommentDto>> AddComment([FromBody] CreateCommDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetCurrentUserId();
+
+            // Проверка: задача должна существовать и принадлежать пользователю
+            var task = await _context.Tasks
+                .Include(t => t.Board)
+                .FirstOrDefaultAsync(t => t.Id == dto.TaskId);
+
+            if (task == null || task.Board.UserId != userId)
+                return Forbid();
+
+            var comment = new Comment
+            {
+                Text = dto.Text,
+                TaskId = dto.TaskId,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Comments.Add(comment);
+
+            // Создаем уведомление для владельца задачи, если комментирует не он
+            if (task.UserId != userId)
+            {
+                var notification = new Notification
+                {
+                    Text = $"Новый комментарий к задаче \"{task.Title}\"",
+                    UserId = task.UserId,
+                    TaskId = task.Id,
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Notifications.Add(notification);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetComments), new { taskId = comment.TaskId }, new CommentDto
+            {
+                Id = comment.Id,
+                Text = comment.Text,
+                CreatedAt = comment.CreatedAt,
+                AuthorName = User.Identity?.Name
+            });
+        }
+
+        // 🔹 ПЕРЕХОДНИК ДЛЯ ФРОНТЕНДА: POST /api/tasks/{taskId}/comments
+        // Именно этот метод решит твою ошибку 404!
+        [HttpPost("tasks/{taskId}/comments")]
+        public async Task<ActionResult<CommentDto>> AddCommentForFrontend(int taskId, [FromBody] CreateCommDto dto)
+        {
+            if (dto.TaskId != taskId)
+                return BadRequest("Несоответствие ID задачи");
+
+            return await AddComment(dto);
+        }
+
+        // 🔹 Получить комментарии к задаче: GET /api/comments/task/{taskId}
         [HttpGet("task/{taskId}")]
         public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments(int taskId)
         {
             var userId = GetCurrentUserId();
 
-            // Проверка: задача должна существовать и принадлежать пользователю (или его доске)
-            // Для простоты проверяем, что задача существует и привязана к доске пользователя
             var taskExists = await _context.Tasks
                 .AnyAsync(t => t.Id == taskId && t.Board.UserId == userId);
 
@@ -36,8 +97,8 @@ namespace Kursovichok2.Controllers
 
             var comments = await _context.Comments
                 .Where(c => c.TaskId == taskId)
-                .Include(c => c.User) // Подгружаем автора комментария
-                .OrderBy(c => c.CreatedAt) // Сортируем по времени создания
+                .Include(c => c.User)
+                .OrderBy(c => c.CreatedAt)
                 .Select(c => new CommentDto
                 {
                     Id = c.Id,
@@ -50,67 +111,12 @@ namespace Kursovichok2.Controllers
             return Ok(comments);
         }
 
-        // 🔹 2. Добавить новый комментарий к задаче
-        [HttpPost]
-        public async Task<ActionResult<CommentDto>> AddComment([FromBody] CreateCommDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var userId = GetCurrentUserId();
-
-            // Проверка прав: можно комментировать только задачи из своих досок
-            var task = await _context.Tasks
-                .Include(t => t.Board)
-                .FirstOrDefaultAsync(t => t.Id == dto.TaskId);
-
-            if (task == null || task.Board.UserId != userId)
-                return Forbid(); // Или NotFound, чтобы не раскрывать наличие чужих задач
-
-            var comment = new Comment
-            {
-                Text = dto.Text,
-                TaskId = dto.TaskId,
-                UserId = userId,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Comments.Add(comment);
-
-            // 🔔 АВТОМАТИЧЕСКОЕ СОЗДАНИЕ УВЕДОМЛЕНИЯ
-            // Если комментирует не владелец задачи, создаем уведомление для владельца
-            if (task.UserId != userId)
-            {
-                var notification = new Notification
-                {
-                    Text = $"Новый комментарий к задаче \"{task.Title}\" от {User.Identity?.Name}",
-                    UserId = task.UserId, // Уведомление получает владелец задачи
-                    TaskId = task.Id,
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(notification);
-            }
-
-            await _context.SaveChangesAsync();
-
-            // Возвращаем созданный комментарий с именем автора
-            return CreatedAtAction(nameof(GetComments), new { taskId = comment.TaskId }, new CommentDto
-            {
-                Id = comment.Id,
-                Text = comment.Text,
-                CreatedAt = comment.CreatedAt,
-                AuthorName = User.Identity?.Name
-            });
-        }
-
-        // 🔹 3. Удалить комментарий
+        // 🔹 Удалить комментарий: DELETE /api/comments/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComment(int id)
         {
             var userId = GetCurrentUserId();
 
-            // Найти комментарий и проверить, что он принадлежит текущему пользователю
             var comment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
             if (comment == null)
@@ -122,7 +128,7 @@ namespace Kursovichok2.Controllers
             return NoContent();
         }
 
-        // Вспомогательный метод для получения ID текущего пользователя из JWT
+        // Вспомогательный метод
         private int GetCurrentUserId()
         {
             return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

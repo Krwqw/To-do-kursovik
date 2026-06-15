@@ -13,5 +13,7 @@ namespace Kursovichok2.DTOs.Task
 
         public List<CommentDto> Comments { get; set; } = new(); /*Вложенный список комментариев, 
                                                                   инициализация = new() создает пустой список*/
+
+        public string? AssigneeName { get; set; }
     }
 }

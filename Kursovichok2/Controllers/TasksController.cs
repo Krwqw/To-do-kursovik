@@ -42,6 +42,33 @@ namespace Kursovichok2.Controllers
             return Ok(tasks);
         }
 
+        // 🔹 Получить детали одной задачи (нужно для редактора)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TaskDetailDto>> GetTaskDetails(int id)
+        {
+            var userId = GetCurrentUserId();
+
+            // Ищем задачу и проверяем, что она принадлежит текущему пользователю
+            var task = await _db.Tasks
+                .Include(t => t.User) // Подгружаем автора/исполнителя
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+            if (task == null) return NotFound();
+
+            // Создаем DTO с деталями
+            var result = new TaskDetailDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status,
+                DueDate = task.DueDate,
+                CreatedAt = task.CreatedAt,
+                AssigneeName = task.User.UserName
+            };
+
+            return Ok(result);
+        }
         // 🔹 ПЕРЕХОДНИК ДЛЯ ФРОНТЕНДА: Принимает запрос /api/boards/{boardId}/tasks
         // Это решит твою ошибку 404 Not Found
         [HttpGet("boards/{boardId}/tasks")]

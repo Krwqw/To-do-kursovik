@@ -1,482 +1,486 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="author" content="Ковалева Ульяна, группа 3-1 ИС" />
-  <title>TaskBoard — Управление задачами</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=5" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Ковалева Ульяна, группа 3-1 ИС" />
+    <title>TaskBoard — Управление задачами</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
 
-  <!-- ТОСТЫ -->
-  <div id="toast-container"></div>
+    <!-- ТОСТЫ -->
+    <div id="toast-container"></div>
 
-  <!-- ЭКРАНЫ АВТОРИЗАЦИИ (показываются, когда пользователь не вошёл) -->
-  <div id="auth-view" class="auth-wrapper hidden">
-    <!-- LOGIN -->
-    <div id="page-login" class="auth-card hidden">
-      <div class="auth-logo">
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="10" fill="#6C63FF"/>
-          <path d="M10 18h16M18 10v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-        <span>TaskBoard</span>
-      </div>
-      <h1 class="auth-title">Добро пожаловать</h1>
-      <p class="auth-subtitle">Войдите в свой аккаунт</p>
-      <form id="login-form" class="auth-form" onsubmit="Auth.login(); return false;">
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required />
+    <!-- ЭКРАНЫ АВТОРИЗАЦИИ (показываются, когда пользователь не вошёл) -->
+    <div id="auth-view" class="auth-wrapper hidden">
+        <!-- LOGIN -->
+        <div id="page-login" class="auth-card hidden">
+            <div class="auth-logo">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                    <rect width="36" height="36" rx="10" fill="#6C63FF" />
+                    <path d="M10 18h16M18 10v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+                <span>TaskBoard</span>
+            </div>
+            <h1 class="auth-title">Добро пожаловать</h1>
+            <p class="auth-subtitle">Войдите в свой аккаунт</p>
+            <form id="login-form" class="auth-form" onsubmit="Auth.login(); return false;">
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required />
+                </div>
+                <div class="field">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" placeholder="••••••" autocomplete="current-password" required />
+                </div>
+                <div id="login-error" class="form-error hidden"></div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span class="btn-text">Войти</span>
+                    <span class="btn-spinner hidden"></span>
+                </button>
+            </form>
+            <p class="auth-footer">Нет аккаунта? <a href="#" onclick="Router.go('register')">Зарегистрироваться</a></p>
+            <p class="auth-credit">Ковалева Ульяна, группа 3-1 ИС</p>
         </div>
-        <div class="field">
-          <label>Пароль</label>
-          <input type="password" id="login-password" placeholder="••••••" autocomplete="current-password" required />
+
+        <!-- РЕГИСТРАЦИЯ -->
+        <div id="page-register" class="auth-card hidden">
+            <div class="auth-logo">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                    <rect width="36" height="36" rx="10" fill="#6C63FF" />
+                    <path d="M10 18h16M18 10v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+                <span>TaskBoard</span>
+            </div>
+            <h1 class="auth-title">Создать аккаунт</h1>
+            <p class="auth-subtitle">Заполните данные для регистрации</p>
+            <form id="register-form" class="auth-form" onsubmit="Auth.register(); return false;">
+                <div class="field">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="reg-username" placeholder="Минимум 5 символов" minlength="5" maxlength="50" required />
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="you@example.com" required />
+                </div>
+                <div class="field">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-password" placeholder="Минимум 6 символов" minlength="6" maxlength="100" required />
+                </div>
+                <div class="field">
+                    <label>Роль</label>
+                    <select id="reg-role">
+                        <option value="user">Исполнитель</option>
+                        <option value="manager">Менеджер</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div id="reg-error" class="form-error hidden"></div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span class="btn-text">Зарегистрироваться</span>
+                    <span class="btn-spinner hidden"></span>
+                </button>
+            </form>
+            <p class="auth-footer">Уже есть аккаунт? <a href="#" onclick="Router.go('login')">Войти</a></p>
+            <p class="auth-credit">Ковалева Ульяна, группа 3-1 ИС</p>
         </div>
-        <div id="login-error" class="form-error hidden"></div>
-        <button type="submit" class="btn btn-primary btn-full">
-          <span class="btn-text">Войти</span>
-          <span class="btn-spinner hidden"></span>
-        </button>
-      </form>
-      <p class="auth-footer">Нет аккаунта? <a href="#" onclick="Router.go('register')">Зарегистрироваться</a></p>
-      <p class="auth-credit">Ковалева Ульяна, группа 3-1 ИС</p>
     </div>
 
-    <!-- РЕГИСТРАЦИЯ -->
-    <div id="page-register" class="auth-card hidden">
-      <div class="auth-logo">
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="10" fill="#6C63FF"/>
-          <path d="M10 18h16M18 10v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-        <span>TaskBoard</span>
-      </div>
-      <h1 class="auth-title">Создать аккаунт</h1>
-      <p class="auth-subtitle">Заполните данные для регистрации</p>
-      <form id="register-form" class="auth-form" onsubmit="Auth.register(); return false;">
-        <div class="field">
-          <label>Имя пользователя</label>
-          <input type="text" id="reg-username" placeholder="Минимум 5 символов" minlength="5" maxlength="50" required />
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="reg-email" placeholder="you@example.com" required />
-        </div>
-        <div class="field">
-          <label>Пароль</label>
-          <input type="password" id="reg-password" placeholder="Минимум 6 символов" minlength="6" maxlength="100" required />
-        </div>
-        <div class="field">
-          <label>Роль</label>
-          <select id="reg-role">
-            <option value="user">Исполнитель</option>
-            <option value="manager">Менеджер</option>
-            <option value="admin">Администратор</option>
-          </select>
-        </div>
-        <div id="reg-error" class="form-error hidden"></div>
-        <button type="submit" class="btn btn-primary btn-full">
-          <span class="btn-text">Зарегистрироваться</span>
-          <span class="btn-spinner hidden"></span>
-        </button>
-      </form>
-      <p class="auth-footer">Уже есть аккаунт? <a href="#" onclick="Router.go('login')">Войти</a></p>
-      <p class="auth-credit">Ковалева Ульяна, группа 3-1 ИС</p>
+    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ (показывается, если пользователь вошёл) -->
+    <div id="app-view" class="app-layout hidden">
+
+        <!-- БОКОВОЕ МЕНЮ -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+                    <rect width="36" height="36" rx="10" fill="#6C63FF" />
+                    <path d="M10 18h16M18 10v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+                <span class="sidebar-brand">TaskBoard</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="Router.go('boards')" data-page="boards">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Мои доски
+                </a>
+                <a href="#" class="nav-item" onclick="Router.go('notifications')" data-page="notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    Уведомления
+                    <span id="notif-badge" class="badge hidden">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="Router.go('profile')" data-page="profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    Профиль
+                </a>
+            </nav>
+
+            <div class="course-credit" id="course-author">Ковалева Ульяна, группа 3-1 ИС</div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar" id="sidebar-avatar">?</div>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebar-name">...</span>
+                        <span class="user-role" id="sidebar-role">...</span>
+                    </div>
+                </div>
+                <button class="btn-icon logout-btn" onclick="Auth.logout()" title="Выйти">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- МОБИЛЬНАЯ НАВИГАЦИЯ -->
+        <nav class="mobile-nav">
+            <a href="#" class="mobile-nav-item" onclick="Router.go('boards')" data-page="boards" title="Мои доски">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                <span>Доски</span>
+            </a>
+            <a href="#" class="mobile-nav-item" onclick="Router.go('notifications')" data-page="notifications" title="Уведомления">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span>Увед.</span>
+            </a>
+            <a href="#" class="mobile-nav-item" onclick="Router.go('profile')" data-page="profile" title="Профиль">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>Профиль</span>
+            </a>
+        </nav>
+
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <main class="main-content">
+
+            <!-- СТРАНИЦА ДОСОК -->
+            <div id="page-boards" class="page hidden">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Мои доски</h1>
+                        <p class="page-subtitle">Управляйте своими проектами</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="Boards.openCreateModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                        Новая доска
+                    </button>
+                </div>
+                <div id="boards-grid" class="boards-grid">
+                    <div class="skeleton-grid">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА ДОСКИ (КАНБАН) -->
+            <div id="page-board" class="page hidden">
+                <div class="page-header">
+                    <div class="board-header-left">
+                        <button class="btn-icon back-btn" onclick="Router.go('boards')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M19 12H5M12 5l-7 7 7 7" />
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 class="page-title" id="board-title">Загрузка...</h1>
+                            <p class="page-subtitle" id="board-desc"></p>
+                        </div>
+                    </div>
+                    <div class="board-actions">
+                        <button class="btn btn-secondary" onclick="Board.openEditModal()">Редактировать</button>
+                        <button class="btn btn-primary" onclick="Board.openTaskModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                            Задача
+                        </button>
+                    </div>
+                </div>
+                <div class="kanban-board" id="kanban-board">
+                    <div class="kanban-col" id="col-todo" data-status="todo">
+                        <div class="col-header">
+                            <div class="col-dot dot-todo"></div>
+                            <span class="col-title">To Do</span>
+                            <span class="col-count" id="count-todo">0</span>
+                        </div>
+                        <div class="col-cards" id="cards-todo"></div>
+                    </div>
+                    <div class="kanban-col" id="col-inprogress" data-status="inprogress">
+                        <div class="col-header">
+                            <div class="col-dot dot-inprogress"></div>
+                            <span class="col-title">In Progress</span>
+                            <span class="col-count" id="count-inprogress">0</span>
+                        </div>
+                        <div class="col-cards" id="cards-inprogress"></div>
+                    </div>
+                    <div class="kanban-col" id="col-done" data-status="done">
+                        <div class="col-header">
+                            <div class="col-dot dot-done"></div>
+                            <span class="col-title">Done</span>
+                            <span class="col-count" id="count-done">0</span>
+                        </div>
+                        <div class="col-cards" id="cards-done"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА ЗАДАЧИ -->
+            <div id="page-task" class="page hidden">
+                <div class="page-header">
+                    <div class="board-header-left">
+                        <button class="btn-icon back-btn" id="task-back-btn" onclick="Board.goBack()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M19 12H5M12 5l-7 7 7 7" />
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 class="page-title" id="task-title">Загрузка...</h1>
+                            <span class="status-badge" id="task-status-badge"></span>
+                        </div>
+                    </div>
+                    <div class="board-actions">
+                        <button class="btn btn-secondary" onclick="TaskDetail.openEditModal()">Редактировать</button>
+                        <button class="btn btn-danger" onclick="TaskDetail.deleteTask()">Удалить</button>
+                    </div>
+                </div>
+
+                <div class="task-layout">
+                    <div class="task-main">
+                        <section class="task-section">
+                            <h3 class="section-label">Описание</h3>
+                            <p id="task-description" class="task-description"></p>
+                        </section>
+                        <section class="task-section">
+                            <h3 class="section-label">Комментарии</h3>
+                            <div id="task-comments" class="comments-list"></div>
+                            <form class="comment-form" onsubmit="TaskDetail.addComment(); return false;">
+                                <textarea id="comment-text" placeholder="Написать комментарий..." rows="3"></textarea>
+                                <button class="btn btn-primary">Отправить</button>
+                            </form>
+                        </section>
+                    </div>
+                    <div class="task-sidebar">
+                        <div class="task-meta-card">
+                            <div class="meta-row">
+                                <span class="meta-label">Статус</span>
+                                <select id="task-status-select" onchange="TaskDetail.changeStatus(this.value)" class="meta-select">
+                                    <option value="todo">To Do</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Дедлайн</span>
+                                <span id="task-due" class="meta-value">—</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Создана</span>
+                                <span id="task-created" class="meta-value">—</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Исполнитель</span>
+                                <span id="task-assignee" class="meta-value">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА УВЕДОМЛЕНИЙ -->
+            <div id="page-notifications" class="page hidden">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Уведомления</h1>
+                        <p class="page-subtitle">Последние изменения в ваших задачах</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="Notifications.markAllRead()">Отметить все прочитанными</button>
+                </div>
+                <div id="notif-list" class="notif-list"></div>
+            </div>
+
+            <!-- СТРАНИЦА ПРОФИЛЯ -->
+            <div id="page-profile" class="page hidden">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Профиль</h1>
+                    </div>
+                </div>
+                <div class="profile-card">
+                    <div class="profile-avatar-big" id="profile-avatar-big">?</div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profile-name">—</div>
+                        <div class="profile-email" id="profile-email">—</div>
+                        <div class="profile-role-badge" id="profile-role">—</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
-  </div>
 
-  <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ (показывается, если пользователь вошёл) -->
-  <div id="app-view" class="app-layout hidden">
-
-    <!-- БОКОВОЕ МЕНЮ -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="10" fill="#6C63FF"/>
-          <path d="M10 18h16M18 10v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-        <span class="sidebar-brand">TaskBoard</span>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" onclick="Router.go('boards')" data-page="boards">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-          </svg>
-          Мои доски
-        </a>
-        <a href="#" class="nav-item" onclick="Router.go('notifications')" data-page="notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          Уведомления
-          <span id="notif-badge" class="badge hidden">0</span>
-        </a>
-        <a href="#" class="nav-item" onclick="Router.go('profile')" data-page="profile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          Профиль
-        </a>
-      </nav>
-
-      <div class="course-credit" id="course-author">Ковалева Ульяна, группа 3-1 ИС</div>
-
-      <div class="sidebar-footer">
-        <div class="sidebar-user">
-          <div class="user-avatar" id="sidebar-avatar">?</div>
-          <div class="user-info">
-            <span class="user-name" id="sidebar-name">...</span>
-            <span class="user-role" id="sidebar-role">...</span>
-          </div>
-        </div>
-        <button class="btn-icon logout-btn" onclick="Auth.logout()" title="Выйти">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-        </button>
-      </div>
-    </aside>
-
-    <!-- МОБИЛЬНАЯ НАВИГАЦИЯ -->
-    <nav class="mobile-nav">
-      <a href="#" class="mobile-nav-item" onclick="Router.go('boards')" data-page="boards" title="Мои доски">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-        </svg>
-        <span>Доски</span>
-      </a>
-      <a href="#" class="mobile-nav-item" onclick="Router.go('notifications')" data-page="notifications" title="Уведомления">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
-        <span>Увед.</span>
-      </a>
-      <a href="#" class="mobile-nav-item" onclick="Router.go('profile')" data-page="profile" title="Профиль">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-        <span>Профиль</span>
-      </a>
-    </nav>
-
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
-    <main class="main-content">
-
-      <!-- СТРАНИЦА ДОСОК -->
-      <div id="page-boards" class="page hidden">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Мои доски</h1>
-            <p class="page-subtitle">Управляйте своими проектами</p>
-          </div>
-          <button class="btn btn-primary" onclick="Boards.openCreateModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Новая доска
-          </button>
-        </div>
-        <div id="boards-grid" class="boards-grid">
-          <div class="skeleton-grid">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- СТРАНИЦА ДОСКИ (КАНБАН) -->
-      <div id="page-board" class="page hidden">
-        <div class="page-header">
-          <div class="board-header-left">
-            <button class="btn-icon back-btn" onclick="Router.go('boards')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M19 12H5M12 5l-7 7 7 7"/>
-              </svg>
-            </button>
-            <div>
-              <h1 class="page-title" id="board-title">Загрузка...</h1>
-              <p class="page-subtitle" id="board-desc"></p>
+    <!-- МОДАЛЬНЫЕ ОКНА -->
+    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ/РЕДАКТИРОВАНИЯ ДОСКИ -->
+    <div id="modal-board" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-board')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-board-title">Новая доска</h2>
+                <button class="btn-icon" onclick="Modal.close('modal-board')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                </button>
             </div>
-          </div>
-          <div class="board-actions">
-            <button class="btn btn-secondary" onclick="Board.openEditModal()">Редактировать</button>
-            <button class="btn btn-primary" onclick="Board.openTaskModal()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              Задача
-            </button>
-          </div>
-        </div>
-        <div class="kanban-board" id="kanban-board">
-          <div class="kanban-col" id="col-todo" data-status="todo">
-            <div class="col-header">
-              <div class="col-dot dot-todo"></div>
-              <span class="col-title">To Do</span>
-              <span class="col-count" id="count-todo">0</span>
+            <div class="modal-body">
+                <div class="field">
+                    <label>Название <span class="req">*</span></label>
+                    <input type="text" id="board-name-input" placeholder="Название доски" maxlength="100" />
+                </div>
+                <div class="field">
+                    <label>Описание</label>
+                    <textarea id="board-desc-input" placeholder="Опционально" maxlength="500" rows="3"></textarea>
+                </div>
             </div>
-            <div class="col-cards" id="cards-todo"></div>
-          </div>
-          <div class="kanban-col" id="col-inprogress" data-status="inprogress">
-            <div class="col-header">
-              <div class="col-dot dot-inprogress"></div>
-              <span class="col-title">In Progress</span>
-              <span class="col-count" id="count-inprogress">0</span>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="Modal.close('modal-board')">Отмена</button>
+                <button class="btn btn-primary" id="board-submit-btn" onclick="Boards.submitBoard()">Создать</button>
             </div>
-            <div class="col-cards" id="cards-inprogress"></div>
-          </div>
-          <div class="kanban-col" id="col-done" data-status="done">
-            <div class="col-header">
-              <div class="col-dot dot-done"></div>
-              <span class="col-title">Done</span>
-              <span class="col-count" id="count-done">0</span>
-            </div>
-            <div class="col-cards" id="cards-done"></div>
-          </div>
         </div>
-      </div>
-
-      <!-- СТРАНИЦА ЗАДАЧИ -->
-      <div id="page-task" class="page hidden">
-        <div class="page-header">
-          <div class="board-header-left">
-            <button class="btn-icon back-btn" id="task-back-btn" onclick="Board.goBack()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M19 12H5M12 5l-7 7 7 7"/>
-              </svg>
-            </button>
-            <div>
-              <h1 class="page-title" id="task-title">Загрузка...</h1>
-              <span class="status-badge" id="task-status-badge"></span>
-            </div>
-          </div>
-          <div class="board-actions">
-            <button class="btn btn-secondary" onclick="TaskDetail.openEditModal()">Редактировать</button>
-            <button class="btn btn-danger" onclick="TaskDetail.deleteTask()">Удалить</button>
-          </div>
-        </div>
-
-        <div class="task-layout">
-          <div class="task-main">
-            <section class="task-section">
-              <h3 class="section-label">Описание</h3>
-              <p id="task-description" class="task-description"></p>
-            </section>
-            <section class="task-section">
-              <h3 class="section-label">Комментарии</h3>
-              <div id="task-comments" class="comments-list"></div>
-              <form class="comment-form" onsubmit="TaskDetail.addComment(); return false;">
-                <textarea id="comment-text" placeholder="Написать комментарий..." rows="3"></textarea>
-                <button class="btn btn-primary">Отправить</button>
-              </form>
-            </section>
-          </div>
-          <div class="task-sidebar">
-            <div class="task-meta-card">
-              <div class="meta-row">
-                <span class="meta-label">Статус</span>
-                <select id="task-status-select" onchange="TaskDetail.changeStatus(this.value)" class="meta-select">
-                  <option value="todo">To Do</option>
-                  <option value="inprogress">In Progress</option>
-                  <option value="done">Done</option>
-                </select>
-              </div>
-              <div class="meta-row">
-                <span class="meta-label">Дедлайн</span>
-                <span id="task-due" class="meta-value">—</span>
-              </div>
-              <div class="meta-row">
-                <span class="meta-label">Создана</span>
-                <span id="task-created" class="meta-value">—</span>
-              </div>
-              <div class="meta-row">
-                <span class="meta-label">Исполнитель</span>
-                <span id="task-assignee" class="meta-value">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- СТРАНИЦА УВЕДОМЛЕНИЙ -->
-      <div id="page-notifications" class="page hidden">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Уведомления</h1>
-            <p class="page-subtitle">Последние изменения в ваших задачах</p>
-          </div>
-          <button class="btn btn-secondary" onclick="Notifications.markAllRead()">Отметить все прочитанными</button>
-        </div>
-        <div id="notif-list" class="notif-list"></div>
-      </div>
-
-      <!-- СТРАНИЦА ПРОФИЛЯ -->
-      <div id="page-profile" class="page hidden">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Профиль</h1>
-          </div>
-        </div>
-        <div class="profile-card">
-          <div class="profile-avatar-big" id="profile-avatar-big">?</div>
-          <div class="profile-info">
-            <div class="profile-name" id="profile-name">—</div>
-            <div class="profile-email" id="profile-email">—</div>
-            <div class="profile-role-badge" id="profile-role">—</div>
-          </div>
-        </div>
-      </div>
-
-    </main>
-  </div>
-
-  <!-- МОДАЛЬНЫЕ ОКНА -->
-
-  <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ/РЕДАКТИРОВАНИЯ ДОСКИ -->
-  <div id="modal-board" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-board')">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 id="modal-board-title">Новая доска</h2>
-        <button class="btn-icon" onclick="Modal.close('modal-board')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="field">
-          <label>Название <span class="req">*</span></label>
-          <input type="text" id="board-name-input" placeholder="Название доски" maxlength="100" />
-        </div>
-        <div class="field">
-          <label>Описание</label>
-          <textarea id="board-desc-input" placeholder="Опционально" maxlength="500" rows="3"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="Modal.close('modal-board')">Отмена</button>
-        <button class="btn btn-primary" id="board-submit-btn" onclick="Boards.submitBoard()">Создать</button>
-      </div>
     </div>
-  </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ЗАДАЧИ -->
-  <div id="modal-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-task')">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Новая задача</h2>
-        <button class="btn-icon" onclick="Modal.close('modal-task')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="field">
-          <label>Название <span class="req">*</span></label>
-          <input type="text" id="task-name-input" placeholder="Название задачи" maxlength="100" />
+    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ЗАДАЧИ -->
+    <div id="modal-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-task')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Новая задача</h2>
+                <button class="btn-icon" onclick="Modal.close('modal-task')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field">
+                    <label>Название <span class="req">*</span></label>
+                    <input type="text" id="task-name-input" placeholder="Название задачи" maxlength="100" />
+                </div>
+                <div class="field">
+                    <label>Описание</label>
+                    <textarea id="task-desc-input" placeholder="Опционально" maxlength="1000" rows="3"></textarea>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label>Статус</label>
+                        <select id="task-status-input">
+                            <option value="todo">To Do</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Дедлайн</label>
+                        <input type="date" id="task-due-input" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="Modal.close('modal-task')">Отмена</button>
+                <button class="btn btn-primary" onclick="Board.submitTask()">Создать</button>
+            </div>
         </div>
-        <div class="field">
-          <label>Описание</label>
-          <textarea id="task-desc-input" placeholder="Опционально" maxlength="1000" rows="3"></textarea>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>Статус</label>
-            <select id="task-status-input">
-              <option value="todo">To Do</option>
-              <option value="inprogress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Дедлайн</label>
-            <input type="date" id="task-due-input" />
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="Modal.close('modal-task')">Отмена</button>
-        <button class="btn btn-primary" onclick="Board.submitTask()">Создать</button>
-      </div>
     </div>
-  </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ЗАДАЧИ -->
-  <div id="modal-edit-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-edit-task')">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Редактировать задачу</h2>
-        <button class="btn-icon" onclick="Modal.close('modal-edit-task')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="field">
-          <label>Название</label>
-          <input type="text" id="edit-task-name" maxlength="100" />
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ЗАДАЧИ -->
+    <div id="modal-edit-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-edit-task')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Редактировать задачу</h2>
+                <button class="btn-icon" onclick="Modal.close('modal-edit-task')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field">
+                    <label>Название</label>
+                    <input type="text" id="edit-task-name" maxlength="100" />
+                </div>
+                <div class="field">
+                    <label>Описание</label>
+                    <textarea id="edit-task-desc" maxlength="1000" rows="3"></textarea>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label>Статус</label>
+                        <select id="edit-task-status">
+                            <option value="todo">To Do</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Дедлайн</label>
+                        <input type="date" id="edit-task-due" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="Modal.close('modal-edit-task')">Отмена</button>
+                <button class="btn btn-primary" onclick="TaskDetail.submitEdit()">Сохранить</button>
+            </div>
         </div>
-        <div class="field">
-          <label>Описание</label>
-          <textarea id="edit-task-desc" maxlength="1000" rows="3"></textarea>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>Статус</label>
-            <select id="edit-task-status">
-              <option value="todo">To Do</option>
-              <option value="inprogress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Дедлайн</label>
-            <input type="date" id="edit-task-due" />
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="Modal.close('modal-edit-task')">Отмена</button>
-        <button class="btn btn-primary" onclick="TaskDetail.submitEdit()">Сохранить</button>
-      </div>
     </div>
-  </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ -->
-  <div id="modal-confirm" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-confirm')">
-    <div class="modal modal-sm">
-      <div class="modal-header">
-        <h2 id="confirm-title">Подтверждение</h2>
-        <button class="btn-icon" onclick="Modal.close('modal-confirm')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p id="confirm-text">Вы уверены?</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="Modal.close('modal-confirm')">Отмена</button>
-        <button class="btn btn-danger" id="confirm-btn">Удалить</button>
-      </div>
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ -->
+    <div id="modal-confirm" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-confirm')">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h2 id="confirm-title">Подтверждение</h2>
+                <button class="btn-icon" onclick="Modal.close('modal-confirm')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-text">Вы уверены?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="Modal.close('modal-confirm')">Отмена</button>
+                <button class="btn btn-danger" id="confirm-btn">Удалить</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- СКРИПТЫ (порядок загрузки важен) -->
-  <script src="js/config.js?v=5"></script>
-  <script src="js/api.js?v=5"></script>
-  <script src="js/auth.js?v=5"></script>
-  <script src="js/router.js?v=5"></script>
-  <script src="js/modal.js?v=5"></script>
-  <script src="js/toast.js?v=5"></script>
-  <script src="js/pages/boards.js?v=5"></script>
-  <script src="js/pages/board.js?v=5"></script>
-  <script src="js/pages/task.js?v=5"></script>
-  <script src="js/pages/notifications.js?v=5"></script>
-  <script src="js/app.js?v=5"></script>
+    <!-- СКРИПТЫ (порядок загрузки важен) -->
+    <script src="js/config.js?v=5"></script>
+    <script src="js/api.js?v=5"></script>
+    <script src="js/auth.js?v=5"></script>
+    <script src="js/router.js?v=5"></script>
+    <script src="js/modal.js?v=5"></script>
+    <script src="js/toast.js?v=5"></script>
+    <script src="js/pages/boards.js?v=5"></script>
+    <script src="js/pages/board.js?v=5"></script>
+    <script src="js/pages/task.js?v=5"></script>
+    <script src="js/pages/notifications.js?v=5"></script>
+    <script src="js/app.js?v=5"></script>
 </body>
 </html>

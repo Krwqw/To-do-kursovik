@@ -105,31 +105,30 @@ namespace Kursovichok2.Controllers
                 expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpirationInMinutes"] ?? "60")),
                 signingCredentials: creds
             );
-
-            // 🔹 Получить данные текущего пользователя (Профиль)
-            [HttpGet("profile")]
-            [Authorize]
-            async Task<ActionResult<UserProfileDto>> GetProfile()
-            {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-                var user = await _context.Users
-                    .Where(u => u.Id == userId)
-                    .Select(u => new UserProfileDto
-                    {
-                        Id = u.Id,
-                        UserName = u.UserName,
-                        Email = u.Email,
-                        Role = u.Role
-                    })
-                    .FirstOrDefaultAsync();
-
-                if (user == null) return NotFound();
-
-                return Ok(user);
-            }
-
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        // 🔹 Получить данные текущего пользователя (Профиль)
+        [HttpGet("profile")]
+        [Authorize]
+        async Task<ActionResult<UserProfileDto>> GetProfile()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var user = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new UserProfileDto
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    Role = u.Role
+                })
+                .FirstOrDefaultAsync();
+
+            if (user == null) return NotFound();
+
+            return Ok(user);
+        }
+
     }
 }

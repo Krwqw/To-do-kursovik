@@ -109,7 +109,7 @@ var TaskDetail = {
     }
 
     try {
-      const comment = await Api.post(`/tasks/${task.id}/comments`, { text, taskId: task.id });
+      const comment = await Api.post(`/comments`, { text: text, taskId: task.id });
       task.comments = [...(task.comments || []), comment];
       textarea.value = '';
       Toast.show('Комментарий добавлен.');
