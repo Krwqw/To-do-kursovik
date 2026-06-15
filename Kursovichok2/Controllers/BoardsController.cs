@@ -3,26 +3,32 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Kursovichok2.Data;
-using Kursovichok2.DTOs.Board;
+using Kursovichok2.DTOs.Board; // Убедись, что у тебя есть такой namespace для DTO
 using Kursovichok2.Models;
 
 namespace Kursovichok2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize] // Требует авторизации для всех методов
     public class BoardsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        // 1. Объявляем поле для контекста БД
+        private readonly AppDbContext _context;
 
-        public BoardsController(AppDbContext db) => _db = db;
-
-        // Получить мои доски
-        [HttpGet]
-        public async Task<IActionResult> GetMyBoards()
+        // 2. Конструктор, который получает контекст через Dependency Injection
+        public BoardsController(AppDbContext context)
         {
-            int userId = GetUserId();
-            var boards = await _db.Boards
+            _context = context;
+        }
+
+        // 🔹 Получить все доски текущего пользователя
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BoardCardDto>>> GetBoards()
+        {
+            var userId = GetCurrentUserId();
+
+            var boards = await _context.Boards
                 .Where(b => b.UserId == userId)
                 .Select(b => new BoardCardDto
                 {
@@ -37,11 +43,41 @@ namespace Kursovichok2.Controllers
             return Ok(boards);
         }
 
-        // Создать доску
-        [HttpPost]
-        public async Task<IActionResult> CreateBoard([FromBody] CreateBoardDto dto)
+        // 🔹 Получить одну доску по ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BoardCardDto>> GetBoard(int id)
         {
-            int userId = GetUserId();
+            var userId = GetCurrentUserId();
+
+            var board = await _context.Boards
+                .Where(b => b.Id == id && b.UserId == userId)
+                .Select(b => new BoardCardDto
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Description = b.Description,
+                    CreatedAt = b.CreatedAt,
+                    OwnerId = b.UserId
+                })
+                .FirstOrDefaultAsync();
+
+            if (board == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(board);
+        }
+
+        // 🔹 Создать новую доску
+        [HttpPost]
+        public async Task<ActionResult<BoardCardDto>> CreateBoard([FromBody] CreateBoardDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetCurrentUserId();
+
             var board = new Board
             {
                 Title = dto.Title,
@@ -50,30 +86,79 @@ namespace Kursovichok2.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            _db.Boards.Add(board);
-            await _db.SaveChangesAsync();
+            _context.Boards.Add(board);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetMyBoards), new { id = board.Id }, board);
+            var result = new BoardCardDto
+            {
+                Id = board.Id,
+                Title = board.Title,
+                Description = board.Description,
+                CreatedAt = board.CreatedAt,
+                OwnerId = board.UserId
+            };
+
+            // Возвращаем 201 Created и ссылку на созданный ресурс
+            return CreatedAtAction(nameof(GetBoard), new { id = board.Id }, result);
         }
 
-        // Удалить доску
+        // 🔹 Обновить доску (частичное обновление)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBoard(int id, [FromBody] EditBoardDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetCurrentUserId();
+
+            var board = await _context.Boards.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+
+            if (board == null)
+                return NotFound();
+
+            // Обновляем только если поля переданы
+            if (dto.Title != null)
+                board.Title = dto.Title;
+
+            if (dto.Description != null)
+                board.Description = dto.Description;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // Возвращаем 204 No Content
+        }
+
+        // 🔹 Удалить доску
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBoard(int id)
         {
-            int userId = GetUserId();
-            var board = await _db.Boards.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
+            var userId = GetCurrentUserId();
 
-            if (board == null) return NotFound("Доска не найдена или нет прав");
+            var board = await _context.Boards.FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
 
-            _db.Boards.Remove(board);
-            await _db.SaveChangesAsync();
+            if (board == null)
+                return NotFound();
+
+            _context.Boards.Remove(board);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
-        // Вспомогательный метод: взять ID из токена
-        private int GetUserId()
+        // --- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ---
+
+        // Метод для получения ID текущего пользователя из JWT токена
+        private int GetCurrentUserId()
         {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            // Ищем claim с именем NameIdentifier (стандарт для ID пользователя в JWT)
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+
+            return int.Parse(userIdClaim);
         }
     }
 }

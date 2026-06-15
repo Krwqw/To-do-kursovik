@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Kursovichok2.Data;
+using Kursovichok2.DTOs.Autentif; // Проверь, что путь к твоим DTO верный
+using Kursovichok2.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Kursovichok2.Data;
-using Kursovichok2.DTOs.Autentif; // Проверь, что путь к твоим DTO верный
-using Kursovichok2.Models;
 
 namespace Kursovichok2.Controllers
 {
@@ -104,6 +105,29 @@ namespace Kursovichok2.Controllers
                 expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpirationInMinutes"] ?? "60")),
                 signingCredentials: creds
             );
+
+            // 🔹 Получить данные текущего пользователя (Профиль)
+            [HttpGet("profile")]
+            [Authorize]
+            async Task<ActionResult<UserProfileDto>> GetProfile()
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                var user = await _context.Users
+                    .Where(u => u.Id == userId)
+                    .Select(u => new UserProfileDto
+                    {
+                        Id = u.Id,
+                        UserName = u.UserName,
+                        Email = u.Email,
+                        Role = u.Role
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (user == null) return NotFound();
+
+                return Ok(user);
+            }
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

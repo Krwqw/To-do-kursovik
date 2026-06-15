@@ -7,6 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\index.html" />
+    <None Include="wwwroot\js\api.js" />
+    <None Include="wwwroot\js\app.js" />
+    <None Include="wwwroot\js\auth.js" />
+    <None Include="wwwroot\js\config.js" />
+    <None Include="wwwroot\js\modal.js" />
+    <None Include="wwwroot\js\pages\board.js" />
+    <None Include="wwwroot\js\pages\boards.js" />
+    <None Include="wwwroot\js\pages\notifications.js" />
+    <None Include="wwwroot\js\pages\task.js" />
+    <None Include="wwwroot\js\router.js" />
+    <None Include="wwwroot\js\toast.js" />
+    <None Include="wwwroot\style.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
