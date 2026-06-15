@@ -1,4 +1,4 @@
-const TaskDetail = {
+var TaskDetail = {
   async load(taskId) {
     if (!taskId) {
       Router.go('boards');

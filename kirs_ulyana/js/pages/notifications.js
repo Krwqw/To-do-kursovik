@@ -1,4 +1,4 @@
-const Notifications = {
+var Notifications = {
   items: [],
 
   async load() {

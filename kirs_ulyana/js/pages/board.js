@@ -1,4 +1,4 @@
-const Board = {
+var Board = {
   tasks: [],
 
   async load(boardId) {

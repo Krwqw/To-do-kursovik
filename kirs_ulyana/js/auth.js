@@ -1,4 +1,4 @@
-const Auth = {
+var Auth = {
   init() {
     const savedUser = localStorage.getItem('taskboard_user');
     AppState.user = savedUser ? JSON.parse(savedUser) : null;

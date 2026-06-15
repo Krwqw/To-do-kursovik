@@ -1,4 +1,4 @@
-const Boards = {
+var Boards = {
   items: [],
   editingBoardId: null,
 

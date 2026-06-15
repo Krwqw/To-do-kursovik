@@ -1,4 +1,4 @@
-const Modal = {
+var Modal = {
   confirmAction: null,
 
   open(id) {

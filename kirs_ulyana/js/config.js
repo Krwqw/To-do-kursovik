@@ -1,14 +1,26 @@
-const AppConfig = {
-  apiBaseUrl: (() => {
-    const { protocol, hostname, port } = window.location;
-    const isStaticPreview = protocol === 'file:' || port === '5500' || port === '3000' || port === '5173';
-    return isStaticPreview ? 'https://localhost:7029/api' : `${window.location.origin}/api`;
+var AppConfig = {
+  apiBaseUrls: (() => {
+    const { protocol, hostname, origin } = window.location;
+    const urls = [];
+
+    if (protocol === 'http:' || protocol === 'https:') {
+      urls.push(`${origin}/api`);
+    }
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || protocol === 'file:') {
+      urls.push('http://localhost:5272/api');
+      urls.push('https://localhost:7029/api');
+      urls.push('http://127.0.0.1:5272/api');
+    }
+
+    return [...new Set(urls)];
   })(),
+  apiBaseUrl: null,
   author: 'Ковалева Ульяна',
   group: '3-1 ИС'
 };
 
-const AppState = {
+var AppState = {
   user: null,
   token: localStorage.getItem('taskboard_token'),
   currentBoard: null,

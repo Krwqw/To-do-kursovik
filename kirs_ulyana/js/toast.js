@@ -1,4 +1,4 @@
-const Toast = {
+var Toast = {
   show(message, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');

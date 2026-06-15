@@ -1,4 +1,4 @@
-const Router = {
+var Router = {
   currentPage: null,
 
   go(page, params = {}) {
