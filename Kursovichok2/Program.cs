@@ -41,26 +41,21 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:5500",
-            "http://localhost:5500"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5500", "https://localhost:7029", "http://localhost:5272")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
-// 4. Контроллеры + Swagger.
+// 🔹 4. Контроллеры и Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// 5. Middleware.
+//  5. Middleware (порядок важен!)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -79,19 +74,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var frontendPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "kirs_ulyana"));
-if (Directory.Exists(frontendPath))
-{
-    var frontendFiles = new PhysicalFileProvider(frontendPath);
-    app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = frontendFiles });
-    app.UseStaticFiles(new StaticFileOptions { FileProvider = frontendFiles });
-}
-
 app.UseCors("AllowFrontend");
-
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
+app.UseAuthentication();  // ⚠️ Сначала проверка токена
+app.UseAuthorization();   // ⚠️ Потом проверка прав
+app.MapControllers();     // ⚠️ Включаем маршруты API
 
 app.Run();
