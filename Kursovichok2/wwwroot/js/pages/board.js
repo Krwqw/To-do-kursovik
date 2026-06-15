@@ -10,7 +10,7 @@ var Board = {
     try {
       const [board, tasks] = await Promise.all([
         Api.get(`/boards/${boardId}`),
-        Api.get(`/boards/${boardId}/tasks`)
+        Api.get(`/tasks?boardId=${boardId}`)
       ]);
       AppState.currentBoard = board;
       this.tasks = tasks;
