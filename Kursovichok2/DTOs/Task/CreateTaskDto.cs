@@ -5,8 +5,8 @@ namespace Kursovichok2.DTOs.Task
     public class CreateTaskDto
     {
         //Создание задачи
-        [Required]
-        [StringLength(100, MinimumLength = 1)]
+        [Required(ErrorMessage = "Название задачи обязательно")]
+        [StringLength(100, ErrorMessage = "Максимум 100 символов")]
         public string Title { get; set; } = string.Empty; //Название, обязательно
 
         [StringLength(1000)]
@@ -18,7 +18,7 @@ namespace Kursovichok2.DTOs.Task
 
         public DateTime? DueDate { get; set; } //дата дедлайна
 
-        [Required]
+        [Required(ErrorMessage = "ID доски обязателен")]
         public int BoardId { get; set; } //айди доски
     }
 }

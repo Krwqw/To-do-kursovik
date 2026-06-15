@@ -14,7 +14,7 @@ namespace Kursovichok2.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Board> Boards { get; set; }
-        public DbSet<Kursovichok2.Models.Task> Tasks { get; set; } //конфликт поэтому полное название класса task
+        public DbSet<Kursovichok2.Models.Ttask> Tasks { get; set; } //конфликт поэтому полное название класса task
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
@@ -46,7 +46,7 @@ namespace Kursovichok2.Data
             });
 
             //конфигурация задач
-            modelBuilder.Entity<Kursovichok2.Models.Task>(entity =>
+            modelBuilder.Entity<Kursovichok2.Models.Ttask>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(100);

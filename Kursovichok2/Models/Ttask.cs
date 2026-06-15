@@ -2,7 +2,7 @@
 
 namespace Kursovichok2.Models
 {
-    public class Task
+    public class Ttask
     {
         public int Id { get; set; } //первичный ключ
         public string Title { get; set; } = string.Empty; //название задачи, защита от нулл

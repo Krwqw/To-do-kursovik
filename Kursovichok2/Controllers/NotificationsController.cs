@@ -20,13 +20,13 @@ namespace Kursovichok2.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<VievNotifDot>>> GetNotifications()
+        public async Task<ActionResult<List<VievNotifDto>>> GetNotifications()
         {
             var userId = GetUserId();
             return await _db.Notifications
                 .Where(n => n.UserId == userId)
                 .OrderByDescending(n => n.CreatedAt)
-                .Select(n => new VievNotifDot
+                .Select(n => new VievNotifDto
                 {
                     Id = n.Id,
                     Text = n.Text,

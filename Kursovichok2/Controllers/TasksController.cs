@@ -1,195 +1,108 @@
-using System.Security.Claims;
-using Kursovichok2.Data;
-using Kursovichok2.DTOs.Comment;
-using Kursovichok2.DTOs.Task;
-using Kursovichok2.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectTask = Kursovichok2.Models.Task;
+using System.Security.Claims;
+using Kursovichok2.Data;
+using Kursovichok2.DTOs.Task; // Твои DTO
+using Kursovichok2.DTOs.Comment; // Для комментариев внутри задачи
+using Kursovichok2.Models;
 
 namespace Kursovichok2.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    [Route("api/tasks")]
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _db;
 
-        public TasksController(AppDbContext db)
+        public TasksController(AppDbContext db) => _db = db;
+
+        // Получить задачи конкретной доски
+        [HttpGet]
+        public async Task<IActionResult> GetTasksByBoard([FromQuery] int boardId)
         {
-            _db = db;
+            int userId = GetUserId();
+
+            // Проверка: эта доска принадлежит мне?
+            var boardExists = await _db.Boards.AnyAsync(b => b.Id == boardId && b.UserId == userId);
+            if (!boardExists) return Forbid();
+
+            var tasks = await _db.Tasks
+                .Where(t => t.BoardId == boardId)
+                .Select(t => new TaskCardDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Status = t.Status,
+                    DueDate = t.DueDate,
+                    AssigneeName = t.User.UserName // Берем имя исполнителя
+                })
+                .ToListAsync();
+
+            return Ok(tasks);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<DetalTaskDto>> GetTask(int id)
-        {
-            var task = await FindUserTask(id);
-            return task is null ? NotFound(new { message = "Задача не найдена." }) : ToDetailDto(task);
-        }
-
+        // Создать задачу
         [HttpPost]
-        public async Task<ActionResult<TaskCardDto>> CreateTask(CreateTaskDto dto)
+        public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto dto)
         {
-            var userId = GetUserId();
-            var boardExists = await _db.Boards.AnyAsync(b => b.Id == dto.BoardId && b.UserId == userId);
-            if (!boardExists)
-            {
-                return NotFound(new { message = "Доска не найдена." });
-            }
+            int userId = GetUserId();
 
-            var task = new ProjectTask
+            // Проверка прав на доску
+            var boardExists = await _db.Boards.AnyAsync(b => b.Id == dto.BoardId && b.UserId == userId);
+            if (!boardExists) return Forbid();
+
+            var task = new Ttask
             {
-                Title = dto.Title.Trim(),
-                Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
-                Status = NormalizeStatus(dto.Status),
+                Title = dto.Title,
+                Description = dto.Description,
+                Status = dto.Status ?? "todo",
                 DueDate = dto.DueDate,
                 BoardId = dto.BoardId,
-                UserId = userId
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow
             };
 
             _db.Tasks.Add(task);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTask), new { id = task.Id }, new TaskCardDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Status = task.Status,
-                DueDate = task.DueDate,
-                AssigneeName = User.Identity?.Name
-            });
+            return CreatedAtAction(nameof(GetTasksByBoard), new { boardId = task.BoardId }, task);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<DetalTaskDto>> EditTask(int id, EditTaskDto dto)
+        // Обновить задачу (или просто сменить статус)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTask(int id, [FromBody] EditTaskDto dto)
         {
-            var task = await FindUserTask(id);
-            if (task is null)
-            {
-                return NotFound(new { message = "Задача не найдена." });
-            }
+            int userId = GetUserId();
+            var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
-            if (!string.IsNullOrWhiteSpace(dto.Title))
-            {
-                task.Title = dto.Title.Trim();
-            }
+            if (task == null) return NotFound();
 
-            task.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
-            if (!string.IsNullOrWhiteSpace(dto.Status))
-            {
-                task.Status = NormalizeStatus(dto.Status);
-            }
+            // Обновляем только то, что пришло
+            if (!string.IsNullOrEmpty(dto.Title)) task.Title = dto.Title;
+            if (!string.IsNullOrEmpty(dto.Status)) task.Status = dto.Status;
+            if (dto.DueDate.HasValue) task.DueDate = dto.DueDate;
+            // Описание можно обновлять аналогично
 
-            task.DueDate = dto.DueDate;
-            AddNotification(task, $"Задача \"{task.Title}\" обновлена.");
             await _db.SaveChangesAsync();
-
-            return ToDetailDto(task);
+            return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        // Удалить задачу
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTask(int id)
         {
-            var task = await FindUserTask(id);
-            if (task is null)
-            {
-                return NotFound(new { message = "Задача не найдена." });
-            }
+            int userId = GetUserId();
+            var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+            if (task == null) return NotFound();
 
             _db.Tasks.Remove(task);
             await _db.SaveChangesAsync();
             return NoContent();
         }
 
-        [HttpPost("{id:int}/comments")]
-        public async Task<ActionResult<VievCommDto>> AddComment(int id, CreateCommDto dto)
-        {
-            var task = await FindUserTask(id);
-            if (task is null)
-            {
-                return NotFound(new { message = "Задача не найдена." });
-            }
-
-            var comment = new Comment
-            {
-                Text = dto.Text.Trim(),
-                TaskId = id,
-                UserId = GetUserId()
-            };
-
-            _db.Comments.Add(comment);
-            AddNotification(task, $"Добавлен комментарий к задаче \"{task.Title}\".");
-            await _db.SaveChangesAsync();
-
-            return new VievCommDto
-            {
-                Id = comment.Id,
-                Text = comment.Text,
-                CreatedAt = comment.CreatedAt,
-                AuthorName = User.Identity?.Name
-            };
-        }
-
-        private async Task<ProjectTask?> FindUserTask(int taskId)
-        {
-            var userId = GetUserId();
-            return await _db.Tasks
-                .Include(t => t.Board)
-                .Include(t => t.User)
-                .Include(t => t.Comments)
-                .ThenInclude(c => c.User)
-                .FirstOrDefaultAsync(t => t.Id == taskId && t.Board.UserId == userId);
-        }
-
-        private void AddNotification(ProjectTask task, string text)
-        {
-            _db.Notifications.Add(new Notification
-            {
-                Text = text,
-                TaskId = task.Id,
-                UserId = GetUserId()
-            });
-        }
-
-        private int GetUserId()
-        {
-            var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(value, out var id) ? id : 0;
-        }
-
-        private static string NormalizeStatus(string? status)
-        {
-            return status?.Trim().ToLowerInvariant() switch
-            {
-                "inprogress" => "inprogress",
-                "done" => "done",
-                _ => "todo"
-            };
-        }
-
-        private static DetalTaskDto ToDetailDto(ProjectTask task)
-        {
-            return new DetalTaskDto
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status,
-                DueDate = task.DueDate,
-                CreatedAt = task.CreatedAt,
-                Comments = task.Comments
-                    .OrderBy(c => c.CreatedAt)
-                    .Select(c => new VievCommDto
-                    {
-                        Id = c.Id,
-                        Text = c.Text,
-                        CreatedAt = c.CreatedAt,
-                        AuthorName = c.User.UserName
-                    })
-                    .ToList()
-            };
-        }
+        private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
     }
 }

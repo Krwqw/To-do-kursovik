@@ -15,7 +15,7 @@ namespace Kursovichok2.Models
 
         //Связи с другими таблицами (один ко многим)
         public ICollection<Board> Boards { get; set; } = new List<Board>();
-        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public ICollection<Ttask> Tasks { get; set; } = new List<Ttask>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 

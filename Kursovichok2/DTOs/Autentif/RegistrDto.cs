@@ -5,15 +5,15 @@ namespace Kursovichok2.DTOs.Autentif
     public class RegistrDto
     {
         //для регистрации надо:
-        [Required]
+        [Required(ErrorMessage = "Имя пользователя обязательно")]
         [StringLength(50, MinimumLength = 5)]
         public string UserName { get; set; } = string.Empty; //имя пользователя, от 5 до 50 символов
 
-        [Required]
+        [Required(ErrorMessage = "Почта обязательно")]
         [EmailAddress]
         public string Email { get; set; } = string.Empty; //почта пользователя для входа
 
-        [Required]
+        [Required(ErrorMessage = "Пароль пользователя обязательно")]
         [StringLength(100, MinimumLength = 6)]
         public string Password { get; set; } = string.Empty; //пароль без хеширования, от 6 до 100 символов
 
