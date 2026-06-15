@@ -1,6 +1,6 @@
 ﻿namespace Kursovichok2.DTOs.Notification
 {
-    public class VievNotifDot
+    public class VievNotifDto
     {
         //просмотр уведомления
         public int Id { get; set; } //айди уведомления

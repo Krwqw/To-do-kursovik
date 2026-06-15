@@ -1,15 +1,12 @@
-﻿using Kursovichok2.Data;
-using Kursovichok2.DTOs;
-using Kursovichok2.DTOs.Autentif;
-using Kursovichok2.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
+using Kursovichok2.Data;
+using Kursovichok2.DTOs.Autentif; // Проверь, что путь к твоим DTO верный
+using Kursovichok2.Models;
 
 namespace Kursovichok2.Controllers
 {
@@ -26,9 +23,9 @@ namespace Kursovichok2.Controllers
             _config = config;
         }
 
-        // 🔹 Регистрация нового пользователя
+        //Регистрация нового пользователя
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegistrDto dto)
+        public async Task<IActionResult> Register([FromBody] RegistrDto dto) // Или RegisterDto, как у тебя назван класс
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,7 +48,7 @@ namespace Kursovichok2.Controllers
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new ServervOtvet
+            return Ok(new ServervOtvet // Или AuthResponseDto, как у тебя назван класс ответа
             {
                 Token = token,
                 UserId = user.Id,
@@ -61,7 +58,7 @@ namespace Kursovichok2.Controllers
             });
         }
 
-        // 🔹 Вход в систему
+        //Вход в систему
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -75,7 +72,7 @@ namespace Kursovichok2.Controllers
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new ServervOtvet
+            return Ok(new ServervOtvet // Или AuthResponseDto
             {
                 Token = token,
                 UserId = user.Id,
@@ -85,7 +82,7 @@ namespace Kursovichok2.Controllers
             });
         }
 
-        // 🔹 Генерация JWT-токена
+        //  Генерация JWT-токена (вспомогательный метод)
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _config.GetSection("JwtSettings");

@@ -5,7 +5,7 @@ namespace Kursovichok2.DTOs.Comment
     public class CreateCommDto
     {
         //создание комментария
-        [Required]
+        [Required(ErrorMessage = "Текст комментария не может быть пустым")]
         public string Text { get; set; } = string.Empty; //текст комментария
 
         [Required]

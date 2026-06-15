@@ -1,6 +1,6 @@
 ﻿namespace Kursovichok2.DTOs.Comment
 {
-    public class VievCommDto
+    public class CommentDto
     {
         public int Id { get; set; } //айди комментораия
 

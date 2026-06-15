@@ -1,7 +1,7 @@
 ﻿using Kursovichok2.DTOs.Comment;
 namespace Kursovichok2.DTOs.Task
 {
-    public class DetalTaskDto
+    public class TaskDetailDto
     {
         //детали задачи
         public int Id { get; set; }  //айди задачи
@@ -11,7 +11,7 @@ namespace Kursovichok2.DTOs.Task
         public DateTime? DueDate { get; set; } //дедлайн, не обязательно, если указан
         public DateTime CreatedAt { get; set; } //дата создания
 
-        public List<VievCommDto> Comments { get; set; } = new(); /*Вложенный список комментариев, 
+        public List<CommentDto> Comments { get; set; } = new(); /*Вложенный список комментариев, 
                                                                   инициализация = new() создает пустой список*/
     }
 }

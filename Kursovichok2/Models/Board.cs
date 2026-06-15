@@ -12,6 +12,6 @@ namespace Kursovichok2.Models
 
         //Связи с другими таблицами (один ко многим)
         public User User { get; set; } = null!; //позволяет получить сощдателя доски. обязательно будет выполнено
-        public ICollection<Task> Tasks { get; set; } = new List<Task>(); //полуячение всех задач на доске
+        public ICollection<Ttask> Tasks { get; set; } = new List<Ttask>(); //полуячение всех задач на доске
     }
 }
