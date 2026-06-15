@@ -123,6 +123,12 @@ select option { background: var(--surface2); }
 .auth-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.6rem; }
 .auth-form { display: flex; flex-direction: column; gap: 1rem; }
 .auth-footer { text-align: center; margin-top: 1.2rem; color: var(--text-muted); font-size: 0.867rem; }
+.auth-credit {
+  text-align: center;
+  margin-top: 0.8rem;
+  color: var(--text-dim);
+  font-size: 0.733rem;
+}
 
 /* ── Поля формы ── */
 .field { display: flex; flex-direction: column; gap: 0.35rem; }
@@ -178,6 +184,16 @@ select option { background: var(--surface2); }
   display: flex; align-items: center; gap: 0.5rem;
   margin-top: auto;
 }
+.course-credit {
+  margin: 0 0.9rem 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.733rem;
+  line-height: 1.35;
+  background: var(--surface2);
+}
 .sidebar-user { display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 0; }
 .user-avatar {
   width: 32px; height: 32px; border-radius: 50%;
@@ -194,6 +210,34 @@ select option { background: var(--surface2); }
 
 .logout-btn { color: var(--text-dim); flex-shrink: 0; }
 .logout-btn:hover { background: rgba(224,82,82,0.1); color: var(--danger); }
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 800;
+  background: var(--surface);
+  border-top: 1.5px solid var(--border);
+  padding: 0.35rem 0.6rem calc(0.35rem + env(safe-area-inset-bottom));
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.25rem;
+}
+.mobile-nav-item {
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.mobile-nav-item svg { width: 18px; height: 18px; }
+.mobile-nav-item.active { background: var(--accent-dim); color: var(--accent); }
 
 /* ── Основной контент ── */
 .main-content { padding: 2rem 2.5rem; overflow-y: auto; }
@@ -482,9 +526,10 @@ select option { background: var(--surface2); }
 @media (max-width: 900px) {
   .app-layout { grid-template-columns: 1fr; }
   .sidebar { display: none; }
+  .mobile-nav { display: grid; }
   .kanban-board { grid-template-columns: 1fr; }
   .task-layout { grid-template-columns: 1fr; }
-  .main-content { padding: 1.25rem; }
+  .main-content { padding: 1.25rem 1.25rem 5.5rem; }
 }
 @media (max-width: 600px) {
   .page-header { flex-direction: column; align-items: flex-start; }

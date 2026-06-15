@@ -60,7 +60,7 @@ namespace Kursovichok2.Data
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Tasks)
                       .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             //конфигурация комментариев
@@ -77,7 +77,7 @@ namespace Kursovichok2.Data
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Comments)
                       .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             //конфигурация уведомлений
@@ -89,7 +89,7 @@ namespace Kursovichok2.Data
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Notifications)
                       .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.Task)
                       .WithMany(t => t.Notifications)
