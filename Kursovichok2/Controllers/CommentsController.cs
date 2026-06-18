@@ -8,129 +8,127 @@ using Kursovichok2.Models;
 
 namespace Kursovichok2.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
+    [Route("api/[controller]")]  // Базовый URL: api/comments
+    [ApiController]              // Авто-валидация и обработка ошибок
+    [Authorize]                  // Все методы требуют JWT-токен
     public class CommentsController : ControllerBase
     {
         private readonly AppDbContext _context;
 
         public CommentsController(AppDbContext context)
         {
-            _context = context;
+            _context = context;  // Подключение к базе данных
         }
 
-        //  ОСНОВНОЙ МЕТОД: POST /api/comments
-        [HttpPost]
+        
+
+        [HttpPost]//создание комментария
         public async Task<ActionResult<CommentDto>> AddComment([FromBody] CreateCommDto dto)
         {
+            // Проверка валидности данных (обязательные поля заполнены)
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // Достаём ID пользователя из токена (безопасно, нельзя подделать)
             var userId = GetCurrentUserId();
 
-            // Проверка: задача должна существовать и принадлежать пользователю
+            // Проверяем: задача существует И принадлежит текущему пользователю
             var task = await _context.Tasks
-                .Include(t => t.Board)
+                .Include(t => t.Board)  // Подгружаем доску задачи
                 .FirstOrDefaultAsync(t => t.Id == dto.TaskId);
 
+            // Если задача не найдена или доска чужая — доступ запрещён
             if (task == null || task.Board.UserId != userId)
                 return Forbid();
 
+            // Создаём новый комментарий
             var comment = new Comment
             {
-                Text = dto.Text,
-                TaskId = dto.TaskId,
-                UserId = userId,
-                CreatedAt = DateTime.UtcNow
+                Text = dto.Text,           // Текст комментария
+                TaskId = dto.TaskId,       // К какой задаче
+                UserId = userId,           // Кто написал
+                CreatedAt = DateTime.UtcNow // Время создания (UTC)
             };
 
-            _context.Comments.Add(comment);
+            _context.Comments.Add(comment);  // Добавляем в БД (пока в памяти)
+            await _context.SaveChangesAsync(); // Сохраняем в базу
 
-            // Создаем уведомление для владельца задачи, если комментирует не он
-            if (task.UserId != userId)
-            {
-                var notification = new Notification
-                {
-                    Text = $"Новый комментарий к задаче \"{task.Title}\"",
-                    UserId = task.UserId,
-                    TaskId = task.Id,
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(notification);
-            }
-
-            await _context.SaveChangesAsync();
-
+            // Возвращаем 201 Created с данными нового комментария
             return CreatedAtAction(nameof(GetComments), new { taskId = comment.TaskId }, new CommentDto
             {
                 Id = comment.Id,
                 Text = comment.Text,
                 CreatedAt = comment.CreatedAt,
-                AuthorName = User.Identity?.Name
+                AuthorName = User.Identity?.Name  // Имя автора из токена
             });
         }
 
-        // 🔹 ПЕРЕХОДНИК ДЛЯ ФРОНТЕНДА: POST /api/tasks/{taskId}/comments
-        // Именно этот метод решит твою ошибку 404!
-        [HttpPost("tasks/{taskId}/comments")]
+        
+
+        [HttpPost("tasks/{taskId}/comments")]//переход для фронта красиво чтоб все быглядело
         public async Task<ActionResult<CommentDto>> AddCommentForFrontend(int taskId, [FromBody] CreateCommDto dto)
         {
+            // Защита: ID в URL и в теле должны совпадать
             if (dto.TaskId != taskId)
                 return BadRequest("Несоответствие ID задачи");
 
+            // Вызываем основной метод
             return await AddComment(dto);
         }
 
-        // 🔹 Получить комментарии к задаче: GET /api/comments/task/{taskId}
-        [HttpGet("task/{taskId}")]
+
+        [HttpGet("task/{taskId}")]//все комментарии у задачи
         public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments(int taskId)
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();  // ID из токена
 
+            // Проверяем: задача существует И принадлежит пользователю
             var taskExists = await _context.Tasks
                 .AnyAsync(t => t.Id == taskId && t.Board.UserId == userId);
 
+            // Если задача не найдена или чужая — 404
             if (!taskExists)
                 return NotFound(new { message = "Задача не найдена или доступ запрещен" });
 
+            // Загружаем комментарии, сортируем по дате (старые → новые)
             var comments = await _context.Comments
-                .Where(c => c.TaskId == taskId)
-                .Include(c => c.User)
-                .OrderBy(c => c.CreatedAt)
-                .Select(c => new CommentDto
+                .Where(c => c.TaskId == taskId)  // Только для этой задачи
+                .Include(c => c.User)            // Подгружаем автора
+                .OrderBy(c => c.CreatedAt)       // Сортировка по времени
+                .Select(c => new CommentDto      // Превращаем в DTO
                 {
                     Id = c.Id,
                     Text = c.Text,
                     CreatedAt = c.CreatedAt,
-                    AuthorName = c.User.UserName
+                    AuthorName = c.User.UserName  // Имя автора
                 })
-                .ToListAsync();
+                .ToListAsync();  // Выполняем SQL-запрос
 
-            return Ok(comments);
+            return Ok(comments);  // 200 OK с массивом комментариев
         }
 
-        // 🔹 Удалить комментарий: DELETE /api/comments/{id}
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}")]//удаление комментария
         public async Task<IActionResult> DeleteComment(int id)
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserId();  // ID из токена
 
+            // Ищем комментарий: ID совпадает И принадлежит пользователю
             var comment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
+            // Если не найден или чужой — 404
             if (comment == null)
                 return NotFound(new { message = "Комментарий не найден или вы не имеете прав на его удаление" });
 
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+            _context.Comments.Remove(comment);  // Помечаем на удаление
+            await _context.SaveChangesAsync();  // Удаляем из БД
 
-            return NoContent();
+            return NoContent();  // 204 NoContent (успех без данных)
         }
 
-        // Вспомогательный метод
-        private int GetCurrentUserId()
+       
+        private int GetCurrentUserId() //метод помогает достать ID пользователя из JWT-токена
         {
+            // Берём клейм NameIdentifier из токена и превращаем в число
             return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         }
     }

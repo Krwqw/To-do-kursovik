@@ -2,7 +2,7 @@
 {
     public class TaskCardDto
     {
-        //Карточка задачи для доски
+        //карточка задачи для доски
         public int Id { get; set; } //айди задачи
         public string Title { get; set; } = string.Empty; //название, не пустое
         public string Status { get; set; } = string.Empty; //статус

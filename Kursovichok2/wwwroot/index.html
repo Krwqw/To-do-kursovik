@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="author" content="Ковалева Ульяна, группа 3-1 ИС" />
     <title>TaskBoard — Управление задачами</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css?v=5" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
 </head>
 <body>
 
@@ -43,7 +43,6 @@
                 </button>
             </form>
             <p class="auth-footer">Нет аккаунта? <a href="#" onclick="Router.go('register')">Зарегистрироваться</a></p>
-            <p class="auth-credit">Ковалева Ульяна, группа 3-1 ИС</p>
         </div>
 
         <!-- РЕГИСТРАЦИЯ -->
@@ -70,14 +69,6 @@
                     <label>Пароль</label>
                     <input type="password" id="reg-password" placeholder="Минимум 6 символов" minlength="6" maxlength="100" required />
                 </div>
-                <div class="field">
-                    <label>Роль</label>
-                    <select id="reg-role">
-                        <option value="user">Исполнитель</option>
-                        <option value="manager">Менеджер</option>
-                        <option value="admin">Администратор</option>
-                    </select>
-                </div>
                 <div id="reg-error" class="form-error hidden"></div>
                 <button type="submit" class="btn btn-primary btn-full">
                     <span class="btn-text">Зарегистрироваться</span>
@@ -85,7 +76,6 @@
                 </button>
             </form>
             <p class="auth-footer">Уже есть аккаунт? <a href="#" onclick="Router.go('login')">Войти</a></p>
-            <p class="auth-credit">Ковалева Ульяна, группа 3-1 ИС</p>
         </div>
     </div>
 
@@ -129,7 +119,6 @@
                 </a>
             </nav>
 
-            <div class="course-credit" id="course-author">Ковалева Ульяна, группа 3-1 ИС</div>
 
             <div class="sidebar-footer">
                 <div class="sidebar-user">
@@ -331,6 +320,7 @@
                         <h1 class="page-title">Профиль</h1>
                     </div>
                 </div>
+
                 <div class="profile-card">
                     <div class="profile-avatar-big" id="profile-avatar-big">?</div>
                     <div class="profile-info">
@@ -341,147 +331,202 @@
                 </div>
             </div>
 
-        </main>
-    </div>
-
-    <!-- МОДАЛЬНЫЕ ОКНА -->
-    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ/РЕДАКТИРОВАНИЯ ДОСКИ -->
-    <div id="modal-board" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-board')">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 id="modal-board-title">Новая доска</h2>
-                <button class="btn-icon" onclick="Modal.close('modal-board')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="field">
-                    <label>Название <span class="req">*</span></label>
-                    <input type="text" id="board-name-input" placeholder="Название доски" maxlength="100" />
-                </div>
-                <div class="field">
-                    <label>Описание</label>
-                    <textarea id="board-desc-input" placeholder="Опционально" maxlength="500" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="Modal.close('modal-board')">Отмена</button>
-                <button class="btn btn-primary" id="board-submit-btn" onclick="Boards.submitBoard()">Создать</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ЗАДАЧИ -->
-    <div id="modal-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-task')">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Новая задача</h2>
-                <button class="btn-icon" onclick="Modal.close('modal-task')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="field">
-                    <label>Название <span class="req">*</span></label>
-                    <input type="text" id="task-name-input" placeholder="Название задачи" maxlength="100" />
-                </div>
-                <div class="field">
-                    <label>Описание</label>
-                    <textarea id="task-desc-input" placeholder="Опционально" maxlength="1000" rows="3"></textarea>
-                </div>
-                <div class="field-row">
-                    <div class="field">
-                        <label>Статус</label>
-                        <select id="task-status-input">
-                            <option value="todo">To Do</option>
-                            <option value="inprogress">In Progress</option>
-                            <option value="done">Done</option>
-                        </select>
+            <!-- МОДАЛЬНЫЕ ОКНА -->
+            <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ/РЕДАКТИРОВАНИЯ ДОСКИ -->
+            <div id="modal-board" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-board')">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2 id="modal-board-title">Новая доска</h2>
+                        <button class="btn-icon" onclick="Modal.close('modal-board')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
                     </div>
-                    <div class="field">
-                        <label>Дедлайн</label>
-                        <input type="date" id="task-due-input" />
+                    <div class="modal-body">
+                        <div class="field">
+                            <label>Название <span class="req">*</span></label>
+                            <input type="text" id="board-name-input" placeholder="Название доски" maxlength="100" />
+                        </div>
+                        <div class="field">
+                            <label>Описание</label>
+                            <textarea id="board-desc-input" placeholder="Опционально" maxlength="500" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="Modal.close('modal-board')">Отмена</button>
+                        <button class="btn btn-primary" id="board-submit-btn" onclick="Boards.submitBoard()">Создать</button>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="Modal.close('modal-task')">Отмена</button>
-                <button class="btn btn-primary" onclick="Board.submitTask()">Создать</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ЗАДАЧИ -->
-    <div id="modal-edit-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-edit-task')">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Редактировать задачу</h2>
-                <button class="btn-icon" onclick="Modal.close('modal-edit-task')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="field">
-                    <label>Название</label>
-                    <input type="text" id="edit-task-name" maxlength="100" />
-                </div>
-                <div class="field">
-                    <label>Описание</label>
-                    <textarea id="edit-task-desc" maxlength="1000" rows="3"></textarea>
-                </div>
-                <div class="field-row">
-                    <div class="field">
-                        <label>Статус</label>
-                        <select id="edit-task-status">
-                            <option value="todo">To Do</option>
-                            <option value="inprogress">In Progress</option>
-                            <option value="done">Done</option>
-                        </select>
+            <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ЗАДАЧИ -->
+            <div id="modal-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-task')">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Новая задача</h2>
+                        <button class="btn-icon" onclick="Modal.close('modal-task')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
                     </div>
-                    <div class="field">
-                        <label>Дедлайн</label>
-                        <input type="date" id="edit-task-due" />
+                    <div class="modal-body">
+                        <div class="field">
+                            <label>Название <span class="req">*</span></label>
+                            <input type="text" id="task-name-input" placeholder="Название задачи" maxlength="100" />
+                        </div>
+                        <div class="field">
+                            <label>Описание</label>
+                            <textarea id="task-desc-input" placeholder="Опционально" maxlength="1000" rows="3"></textarea>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Статус</label>
+                                <select id="task-status-input">
+                                    <option value="todo">To Do</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Дедлайн</label>
+                                <input type="date" id="task-due-input" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="Modal.close('modal-task')">Отмена</button>
+                        <button class="btn btn-primary" onclick="Board.submitTask()">Создать</button>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="Modal.close('modal-edit-task')">Отмена</button>
-                <button class="btn btn-primary" onclick="TaskDetail.submitEdit()">Сохранить</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ -->
-    <div id="modal-confirm" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-confirm')">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h2 id="confirm-title">Подтверждение</h2>
-                <button class="btn-icon" onclick="Modal.close('modal-confirm')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                </button>
+            <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ЗАДАЧИ -->
+            <div id="modal-edit-task" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-edit-task')">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Редактировать задачу</h2>
+                        <button class="btn-icon" onclick="Modal.close('modal-edit-task')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="field">
+                            <label>Название</label>
+                            <input type="text" id="edit-task-name" maxlength="100" />
+                        </div>
+                        <div class="field">
+                            <label>Описание</label>
+                            <textarea id="edit-task-desc" maxlength="1000" rows="3"></textarea>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Статус</label>
+                                <select id="edit-task-status">
+                                    <option value="todo">To Do</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Дедлайн</label>
+                                <input type="date" id="edit-task-due" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="Modal.close('modal-edit-task')">Отмена</button>
+                        <button class="btn btn-primary" onclick="TaskDetail.submitEdit()">Сохранить</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <p id="confirm-text">Вы уверены?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="Modal.close('modal-confirm')">Отмена</button>
-                <button class="btn btn-danger" id="confirm-btn">Удалить</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- СКРИПТЫ (порядок загрузки важен) -->
-    <script src="js/config.js?v=5"></script>
-    <script src="js/api.js?v=5"></script>
-    <script src="js/auth.js?v=5"></script>
-    <script src="js/router.js?v=5"></script>
-    <script src="js/modal.js?v=5"></script>
-    <script src="js/toast.js?v=5"></script>
-    <script src="js/pages/boards.js?v=5"></script>
-    <script src="js/pages/board.js?v=5"></script>
-    <script src="js/pages/task.js?v=5"></script>
-    <script src="js/pages/notifications.js?v=5"></script>
-    <script src="js/deadline-notifier.js?v=1"></script>
-    <script src="js/app.js?v=5"></script>
+            <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ -->
+            <div id="modal-confirm" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-confirm')">
+                <div class="modal modal-sm">
+                    <div class="modal-header">
+                        <h2 id="confirm-title">Подтверждение</h2>
+                        <button class="btn-icon" onclick="Modal.close('modal-confirm')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="confirm-text">Вы уверены?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="Modal.close('modal-confirm')">Отмена</button>
+                        <button class="btn btn-danger" id="confirm-btn">Удалить</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+            <div id="modal-edit-profile" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-edit-profile')">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Редактировать профиль</h2>
+                        <button class="btn-icon" onclick="Modal.close('modal-edit-profile')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="field">
+                            <label>Имя пользователя</label>
+                            <input type="text" id="edit-username" placeholder="Ваше имя" maxlength="50" />
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" id="edit-email" placeholder="your@email.com" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="Modal.close('modal-edit-profile')">Отмена</button>
+                        <button class="btn btn-primary" onclick="Profile.submitEdit()">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- МОДАЛЬНОЕ ОКНО СМЕНЫ ПАРОЛЯ -->
+            <div id="modal-change-password" class="modal-overlay hidden" onclick="Modal.closeOnOverlay(event, 'modal-change-password')">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2>Сменить пароль</h2>
+                        <button class="btn-icon" onclick="Modal.close('modal-change-password')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="field">
+                            <label>Текущий пароль</label>
+                            <input type="password" id="current-password" placeholder="••••••" />
+                        </div>
+                        <div class="field">
+                            <label>Новый пароль</label>
+                            <input type="password" id="new-password" placeholder="Минимум 6 символов" />
+                        </div>
+                        <div class="field">
+                            <label>Подтвердите пароль</label>
+                            <input type="password" id="confirm-password" placeholder="••••••" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" onclick="Modal.close('modal-change-password')">Отмена</button>
+                        <button class="btn btn-primary" onclick="Profile.submitPasswordChange()">Сменить пароль</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- СКРИПТЫ (порядок загрузки важен) -->
+            <script src="js/config.js?v=5"></script>
+            <script src="js/api.js?v=5"></script>
+            <script src="js/auth.js?v=5"></script>
+            <script src="js/router.js?v=5"></script>
+            <script src="js/modal.js?v=5"></script>
+            <script src="js/toast.js?v=5"></script>
+            <script src="js/pages/boards.js?v=5"></script>
+            <script src="js/pages/board.js?v=5"></script>
+            <script src="js/pages/task.js?v=5"></script>
+            <script src="js/pages/notifications.js?v=5"></script>
+            <script src="js/deadline-notifier.js?v=1"></script>
+            <script src="js/app.js?v=5"></script>
 </body>
 </html>

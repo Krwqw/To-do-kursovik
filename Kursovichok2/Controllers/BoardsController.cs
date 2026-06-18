@@ -13,16 +13,16 @@ namespace Kursovichok2.Controllers
     [Authorize] // Требует авторизации для всех методов
     public class BoardsController : ControllerBase
     {
-        // 1. Объявляем поле для контекста БД
+        //объявляем поле для контекста БД
         private readonly AppDbContext _context;
 
-        // 2. Конструктор, который получает контекст через Dependency Injection
+        //Конструктор, который получает контекст через извне, чтоб не создавать их самост
         public BoardsController(AppDbContext context)
         {
             _context = context;
         }
 
-        // 🔹 Получить все доски текущего пользователя
+        //Получить все доски текущего пользователя
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BoardCardDto>>> GetBoards()
         {
@@ -43,7 +43,7 @@ namespace Kursovichok2.Controllers
             return Ok(boards);
         }
 
-        // 🔹 Получить одну доску по ID
+        //Получить одну доску по ID
         [HttpGet("{id}")]
         public async Task<ActionResult<BoardCardDto>> GetBoard(int id)
         {
@@ -69,7 +69,7 @@ namespace Kursovichok2.Controllers
             return Ok(board);
         }
 
-        // 🔹 Создать новую доску
+        //Создать новую доску
         [HttpPost]
         public async Task<ActionResult<BoardCardDto>> CreateBoard([FromBody] CreateBoardDto dto)
         {
@@ -98,11 +98,11 @@ namespace Kursovichok2.Controllers
                 OwnerId = board.UserId
             };
 
-            // Возвращаем 201 Created и ссылку на созданный ресурс
+            //Возвращаем 201 Created и ссылку на созданный ресурс
             return CreatedAtAction(nameof(GetBoard), new { id = board.Id }, result);
         }
 
-        // 🔹 Обновить доску (частичное обновление)
+        //Обновить доску (частичное обновление)
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBoard(int id, [FromBody] EditBoardDto dto)
         {
@@ -128,7 +128,7 @@ namespace Kursovichok2.Controllers
             return NoContent(); // Возвращаем 204 No Content
         }
 
-        // 🔹 Удалить доску
+        //Удалить доску
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBoard(int id)
         {
@@ -145,12 +145,15 @@ namespace Kursovichok2.Controllers
             return NoContent();
         }
 
-        // --- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ---
 
         // Метод для получения ID текущего пользователя из JWT токена
         private int GetCurrentUserId()
         {
             // Ищем claim с именем NameIdentifier (стандарт для ID пользователя в JWT)
+            /*Claim (утверждение или заявленное свойство) — это элемент системы безопасности,
+             * который содержит информацию о пользователе (например, его email, роль или возраст) в виде пары «ключ-значение»*/
+
+
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userIdClaim))

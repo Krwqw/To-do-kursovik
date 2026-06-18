@@ -2,7 +2,7 @@
 
 namespace Kursovichok2.DTOs.Autentif
 {
-    public class ViewProfile
+    public class ViewProfileDto
     {
         //что видно при просмотре профиля
         [Required]

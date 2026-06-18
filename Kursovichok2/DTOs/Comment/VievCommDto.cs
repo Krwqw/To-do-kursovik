@@ -2,6 +2,7 @@
 {
     public class VievCommDto
     {
+        //просмотр комментария
         public int Id { get; set; } //айди комментораия
 
         public string Text { get; set; } = string.Empty; //текст коментария, обязательное поле

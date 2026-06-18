@@ -1,6 +1,6 @@
 ﻿namespace Kursovichok2.DTOs.Autentif
 {
-    public class ServervOtvet
+    public class ServervOtvetDto
     {
         //то что получает фронт от сервера
         public string Token { get; set; } = string.Empty; /*JWT-токен - компактный токен для аутентификации и авторизации, 

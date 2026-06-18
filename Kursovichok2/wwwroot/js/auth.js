@@ -29,12 +29,12 @@ var Auth = {
     const userName = document.getElementById('reg-username').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
-    const role = document.getElementById('reg-role').value;
+
     const errorBox = document.getElementById('reg-error');
     errorBox.classList.add('hidden');
 
     try {
-      const data = await Api.post('/auth/register', { userName, email, password, role });
+      const data = await Api.post('/auth/register', { userName, email, password});
       this.saveSession(data);
       Toast.show('Аккаунт создан.');
       Router.go('boards');

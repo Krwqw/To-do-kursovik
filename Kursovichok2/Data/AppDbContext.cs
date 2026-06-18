@@ -6,13 +6,13 @@ using Kursovichok2.Models;
 
 namespace Kursovichok2.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : DbContext //DbContext — это посреднтр между шарпом и реальной базой данных mysql
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }  //принимает настройки подключения, получает необходимые ему зависимости извне
 
         //представление таблиц в базе данных, через них выполняются все операции в будущем
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; } 
         public DbSet<Board> Boards { get; set; }
         public DbSet<Kursovichok2.Models.Ttask> Tasks { get; set; } //конфликт поэтому полное название класса task
         public DbSet<Comment> Comments { get; set; }
@@ -26,11 +26,11 @@ namespace Kursovichok2.Data
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id); //первичный ключ
-                entity.Property(e => e.UserName).IsRequired().HasMaxLength(50); //имя пользователя, макс 50 символов, 
-                entity.Property(e => e.Email).IsRequired().HasMaxLength(100); //
+                entity.Property(e => e.UserName).IsRequired().HasMaxLength(50); //имя пользователя, макс 50 символов
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(100); //почта, макс 100 символов
                 entity.HasIndex(e => e.Email).IsUnique(); //хэш индекс, уникальный, чтоб не было повторений пользователей
-                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255); //
-                entity.Property(e => e.Role).IsRequired().HasMaxLength(20); //
+                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255); //хеш пароль, макс 255 символов
+                entity.Property(e => e.Role).IsRequired().HasMaxLength(20); //роль макс 20 символов
             });
             //*IsRequired() - не даст сохранить, если нет имени или почты
 
@@ -39,10 +39,10 @@ namespace Kursovichok2.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(100);
-                entity.HasOne(e => e.User)
-                      .WithMany(u => u.Boards)
-                      .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.User) //у каждой доски есть один пользователь
+                      .WithMany(u => u.Boards)//у одного пользователя может быть много досок
+                      .HasForeignKey(e => e.UserId)// связь держится через поле UserId
+                      .OnDelete(DeleteBehavior.Cascade);//каскадное удаление
             });
 
             //конфигурация задач
@@ -55,12 +55,12 @@ namespace Kursovichok2.Data
                 entity.HasOne(e => e.Board)
                       .WithMany(b => b.Tasks)
                       .HasForeignKey(e => e.BoardId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade);//Если удалили доску то все задачи этой доски удалятся
 
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Tasks)
                       .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Restrict);//блокировка удаления пользователя
             });
 
             //конфигурация комментариев
@@ -72,12 +72,12 @@ namespace Kursovichok2.Data
                 entity.HasOne(e => e.Task)
                       .WithMany(t => t.Comments)
                       .HasForeignKey(e => e.TaskId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade);//каскадное удаление комментариев, если удаляется задача, то коммент удаляется
 
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Comments)
                       .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Restrict);//удаление пользоватлея запрещается
             });
 
             //конфигурация уведомлений
@@ -89,12 +89,12 @@ namespace Kursovichok2.Data
                 entity.HasOne(e => e.User)
                       .WithMany(u => u.Notifications)
                       .HasForeignKey(e => e.UserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Restrict);//удаление уведомления запрещается
 
                 entity.HasOne(e => e.Task)
                       .WithMany(t => t.Notifications)
                       .HasForeignKey(e => e.TaskId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade);//каскадное удаление уведомлений, если удаляется задача, то увед удаляется
             });
         }
     }

@@ -8,7 +8,7 @@ namespace Kursovichok2.Models
         public string UserName { get; set; } = string.Empty; //логин
         public string Email { get; set; } = string.Empty;//почта
         public string PasswordHash { get; set; } = string.Empty;//хеш пароля
-        public string Role { get; set; } = "user"; //роль админ, пользователь, менеджер
+        public string Role { get; set; } = "user"; //роль пользователь, для всех авторизованных
         //  = string.Empty - значит защита от того что поле будет незаполненным
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; //авто дата при создании пользователя, записывается как ГГГГ-ММ-ДДТчч:мм:ссZ (T и Z - разделение время от даты)
